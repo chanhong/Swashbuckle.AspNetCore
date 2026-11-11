@@ -1,64 +1,66 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.ReDoc;
+﻿using Swashbuckle.AspNetCore.ReDoc;
 
-namespace ReDoc
+namespace ReDoc;
+
+public class Startup(IConfiguration configuration)
 {
-    public class Startup
+    public IConfiguration Configuration { get; } = configuration;
+
+    public void ConfigureServices(IServiceCollection services)
     {
-        public Startup(IConfiguration configuration)
+        services.AddControllers();
+        services.AddSwaggerGen();
+    }
+
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        if (env.IsDevelopment())
         {
-            Configuration = configuration;
+            app.UseDeveloperExceptionPage();
         }
 
-        public IConfiguration Configuration { get; }
+        app.UseHttpsRedirection();
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        app.UseRouting();
+
+        app.UseAuthorization();
+
+        app.UseEndpoints(endpoints =>
         {
-            services.AddControllers();
+            endpoints.MapControllers();
+            endpoints.MapGet("/", () => Results.Redirect("api-docs"));
 
-            services.AddSwaggerGen();
-        }
+            // Expose the OpenAPI document in other versions of the specification for the UI tests
+            endpoints.MapSwagger("swagger/{documentName}/swaggerv3_1.json", c => c.OpenApiVersion = Microsoft.OpenApi.OpenApiSpecVersion.OpenApi3_1);
+            endpoints.MapSwagger("swagger/{documentName}/swaggerv3_2.json", c => c.OpenApiVersion = Microsoft.OpenApi.OpenApiSpecVersion.OpenApi3_2);
+        });
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        app.UseSwagger(c =>
         {
-            if (env.IsDevelopment())
+            c.OpenApiVersion = Microsoft.OpenApi.OpenApiSpecVersion.OpenApi2_0;
+        });
+
+        app.UseReDoc(c =>
+        {
+            c.RoutePrefix = "api-docs";
+
+            c.ConfigObject = new ConfigObject
             {
-                app.UseDeveloperExceptionPage();
-            }
+                HideDownloadButton = true,
+                HideLoading = true
+            };
+        });
 
-            app.UseHttpsRedirection();
+        app.UseReDoc(c =>
+        {
+            c.RoutePrefix = "api-docs-v3_1";
+            c.SpecUrl = "../swagger/v1/swaggerv3_1.json";
+        });
 
-            app.UseRouting();
-
-            app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
-
-            app.UseSwagger(c =>
-            {
-                c.SerializeAsV2 = true;
-            });
-
-            app.UseReDoc(c =>
-            {
-                c.RoutePrefix = "api-docs";
-
-                c.ConfigObject = new ConfigObject
-                {
-                    HideDownloadButton = true,
-                    HideLoading = true
-                };
-            });
-        }
+        app.UseReDoc(c =>
+        {
+            c.RoutePrefix = "api-docs-v3_2";
+            c.SpecUrl = "../swagger/v1/swaggerv3_2.json";
+        });
     }
 }

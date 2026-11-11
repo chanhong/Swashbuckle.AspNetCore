@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "dotnet-reportgenerator-globaltool": {
+      "version": "5.5.12",
+      "commands": [
+        "reportgenerator"
+      ],
+      "rollForward": false
+    },
+    "dotnet-validate": {
+      "version": "0.0.1-preview.582",
+      "commands": [
+        "dotnet-validate"
+      ],
+      "rollForward": false
+    },
+    "markdownsnippets.tool": {
+      "version": "29.0.0",
+      "commands": [
+        "mdsnippets"
+      ],
+      "rollForward": false
+    },
+    "martincostello.waitfornugetpackage": {
+      "version": "1.4.0",
+      "commands": [
+        "dotnet-wait-for-package"
+      ],
+      "rollForward": false
+    },
+    "meziantou.framework.nugetpackagevalidation.tool": {
+      "version": "2.0.21",
+      "commands": [
+        "meziantou.validate-nuget-package"
+      ],
+      "rollForward": false
+    },
+    "microsoft.openapi.kiota": {
+      "version": "1.38.0",
+      "commands": [
+        "kiota"
+      ],
+      "rollForward": false
+    },
+    "nswag.consolecore": {
+      "version": "14.7.1",
+      "commands": [
+        "nswag"
+      ],
+      "rollForward": false
+    }
+  }
+}
